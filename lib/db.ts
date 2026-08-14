@@ -1,12 +1,13 @@
 import fs from 'fs'
 import path from 'path'
 
-// Vercel 서버리스 환경에서는 /tmp 사용, 로컬에서는 data 디렉토리 사용
-const dataDir = process.env.VERCEL
-  ? '/tmp/welcon-data'
-  : path.join(process.cwd(), 'data')
+const dataDir = path.join(process.cwd(), 'data')
 const employeesFile = path.join(dataDir, 'employees.json')
 const eventsFile = path.join(dataDir, 'events.json')
+
+// 메모리 캐시 (Vercel 서버리스 환경에서 사용)
+let employeesCache: any[] | null = null
+let eventCache: any[] | null = null
 
 // 디렉토리 생성
 function ensureDataDir() {
@@ -77,9 +78,41 @@ export function initializeDatabase() {
   console.log('✅ 데이터베이스 초기화 완료')
 }
 
-// 직원 조회
+// 직원 조회 (캐시 사용)
 export function getEmployees() {
-  return readJsonFile(employeesFile, [])
+  // 캐시가 있으면 캐시 반환
+  if (employeesCache) {
+    return employeesCache
+  }
+
+  // 파일에서 읽기
+  const data = readJsonFile(employeesFile, [])
+
+  // 파일이 비어있으면 기본값 사용
+  if (data.length === 0) {
+    const defaultEmployees = [
+      { id: 'admin-001', name: '박종미', email: 'jongmi@welconsystems.com', color_index: -1, password: 'admin123', role: 'admin', created_at: new Date().toISOString() },
+      { id: '1', name: '김철수', email: 'chulsu@welconsystems.com', color_index: 0, password: '1234', role: 'user', created_at: new Date().toISOString() },
+      { id: '2', name: '이영희', email: 'younghee@welconsystems.com', color_index: 1, password: '1234', role: 'user', created_at: new Date().toISOString() },
+      { id: '3', name: '박민준', email: 'minjun@welconsystems.com', color_index: 2, password: '1234', role: 'user', created_at: new Date().toISOString() },
+      { id: '4', name: '최지은', email: 'jieun@welconsystems.com', color_index: 3, password: '1234', role: 'user', created_at: new Date().toISOString() },
+      { id: '5', name: '정준호', email: 'junho@welconsystems.com', color_index: 4, password: '1234', role: 'user', created_at: new Date().toISOString() },
+      { id: '6', name: '강미영', email: 'miyoung@welconsystems.com', color_index: 5, password: '1234', role: 'user', created_at: new Date().toISOString() },
+      { id: '7', name: '이광순', email: 'kwangsoon@welconsystems.com', color_index: 6, password: '1234', role: 'user', created_at: new Date().toISOString() },
+      { id: '8', name: '현수빈', email: 'subin@welconsystems.com', color_index: 7, password: '1234', role: 'user', created_at: new Date().toISOString() },
+      { id: '9', name: '송민정', email: 'minjeong@welconsystems.com', color_index: 8, password: '1234', role: 'user', created_at: new Date().toISOString() },
+      { id: '10', name: '한승준', email: 'seungjun@welconsystems.com', color_index: 9, password: '1234', role: 'user', created_at: new Date().toISOString() },
+      { id: '11', name: '조세희', email: 'sehee@welconsystems.com', color_index: 10, password: '1234', role: 'user', created_at: new Date().toISOString() },
+      { id: '12', name: '윤나영', email: 'nayoung@welconsystems.com', color_index: 11, password: '1234', role: 'user', created_at: new Date().toISOString() },
+      { id: '13', name: '배지현', email: 'jihyun@welconsystems.com', color_index: 12, password: '1234', role: 'user', created_at: new Date().toISOString() },
+    ]
+    employeesCache = defaultEmployees
+    return defaultEmployees
+  }
+
+  // 캐시에 저장
+  employeesCache = data
+  return data
 }
 
 // 직원 추가
