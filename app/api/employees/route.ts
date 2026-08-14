@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getEmployees, addEmployee } from '@/lib/db'
+import { getEmployees, addEmployee, initializeDatabase } from '@/lib/db'
 
 export async function GET() {
   try {
+    // 데이터베이스 초기화 (첫 실행 시)
+    initializeDatabase()
+
     const employees = getEmployees()
     return NextResponse.json(employees)
   } catch (error) {
