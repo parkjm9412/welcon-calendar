@@ -173,10 +173,10 @@ export default function AdminPage() {
         const res = await fetch(url, {
           method: 'DELETE',
         })
-        console.log('응답 상태:', res.status)
+        console.log('응답 상태:', res.status, '| res.ok:', res.ok)
         const data = await res.json()
         console.log('응답 데이터:', data)
-        if (res.ok) {
+        if (res.status === 200) {
           successCount++
         }
       }
