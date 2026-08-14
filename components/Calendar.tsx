@@ -1,7 +1,7 @@
 'use client'
 
 import { CalendarEvent, Employee } from '@/types'
-import { getDaysInMonth, getDayName } from '@/lib/calendar-utils'
+import { getDaysInMonth } from '@/lib/calendar-utils'
 import CalendarDay from './CalendarDay'
 
 interface CalendarProps {
