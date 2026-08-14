@@ -9,33 +9,6 @@
     "created_at": "2026-08-13T09:08:15.649Z"
   },
   {
-    "id": "0ed9ece8-d9bb-42e3-a527-6626ca3f1cc1",
-    "name": "김철수",
-    "email": "chulsu@welconsystems.com",
-    "color_index": 0,
-    "password": "1234",
-    "role": "user",
-    "created_at": "2026-08-13T09:08:15.649Z"
-  },
-  {
-    "id": "f4393c1e-7dc1-4b44-a92e-690697e450bb",
-    "name": "이영희",
-    "email": "younghee@welconsystems.com",
-    "color_index": 1,
-    "password": "1234",
-    "role": "user",
-    "created_at": "2026-08-13T09:08:15.649Z"
-  },
-  {
-    "id": "851e9faf-58ef-4e0c-aace-f105c1fb39ba",
-    "name": "박민준",
-    "email": "minjun@welconsystems.com",
-    "color_index": 2,
-    "password": "1234",
-    "role": "user",
-    "created_at": "2026-08-13T09:08:15.649Z"
-  },
-  {
     "id": "88d17202-f922-4c67-ac4f-6728bd50c5ff",
     "name": "최지은",
     "email": "jieun@welconsystems.com",
@@ -76,51 +49,6 @@
     "name": "현수빈",
     "email": "subin@welconsystems.com",
     "color_index": 7,
-    "password": "1234",
-    "role": "user",
-    "created_at": "2026-08-13T09:08:15.649Z"
-  },
-  {
-    "id": "476eaf95-209f-40d5-9552-fdeaf326a9e6",
-    "name": "송민정",
-    "email": "minjeong@welconsystems.com",
-    "color_index": 8,
-    "password": "1234",
-    "role": "user",
-    "created_at": "2026-08-13T09:08:15.649Z"
-  },
-  {
-    "id": "b47a74e5-b152-4ded-8be5-543f3ab76951",
-    "name": "한승준",
-    "email": "seungjun@welconsystems.com",
-    "color_index": 9,
-    "password": "1234",
-    "role": "user",
-    "created_at": "2026-08-13T09:08:15.649Z"
-  },
-  {
-    "id": "5c9e1836-aea3-41a9-abb5-021a9fe5924b",
-    "name": "조세희",
-    "email": "sehee@welconsystems.com",
-    "color_index": 10,
-    "password": "1234",
-    "role": "user",
-    "created_at": "2026-08-13T09:08:15.649Z"
-  },
-  {
-    "id": "0a534e73-cb55-4442-afb5-967f04b69cb9",
-    "name": "윤나영",
-    "email": "nayoung@welconsystems.com",
-    "color_index": 11,
-    "password": "1234",
-    "role": "user",
-    "created_at": "2026-08-13T09:08:15.649Z"
-  },
-  {
-    "id": "06ff2e67-34c7-4019-a610-3f0d1ac2d135",
-    "name": "배지현",
-    "email": "jihyun@welconsystems.com",
-    "color_index": 12,
     "password": "1234",
     "role": "user",
     "created_at": "2026-08-13T09:08:15.649Z"

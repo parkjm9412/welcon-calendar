@@ -167,9 +167,14 @@ export default function AdminPage() {
     try {
       let successCount = 0
       for (const id of selected) {
-        const res = await fetch(`/api/admin/employees/${id}`, {
+        const url = `/api/admin/employees/${id}`
+        console.log('DELETE 요청:', url)
+        const res = await fetch(url, {
           method: 'DELETE',
         })
+        console.log('응답 상태:', res.status)
+        const data = await res.json()
+        console.log('응답 데이터:', data)
         if (res.ok) {
           successCount++
         }

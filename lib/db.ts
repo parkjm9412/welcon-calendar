@@ -9,6 +9,11 @@ const eventsFile = path.join(dataDir, 'events.json')
 let employeesCache: any[] | null = null
 let eventCache: any[] | null = null
 
+// 캐시 초기화 함수
+export function clearEmployeesCache() {
+  employeesCache = null
+}
+
 // 디렉토리 생성
 function ensureDataDir() {
   if (!fs.existsSync(dataDir)) {
