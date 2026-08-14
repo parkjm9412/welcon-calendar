@@ -15,24 +15,32 @@ export default function LoginPage() {
     setError('')
 
     try {
+      console.log('로그인 시도:', { name, password })
+
       const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, password }),
       })
 
+      console.log('응답 상태:', res.status)
+
       const data = await res.json()
+      console.log('응답 데이터:', data)
 
       if (res.ok && data.employee) {
-        // localStorage에 저장
+        console.log('로그인 성공:', data.employee)
         localStorage.setItem('user', JSON.stringify(data.employee))
-        // 페이지 새로고침 후 리다이렉트
-        window.location.href = '/'
+        setTimeout(() => {
+          window.location.href = '/'
+        }, 500)
       } else {
-        setError(data.message || '로그인 실패했습니다')
+        const errorMsg = data.message || '로그인 실패했습니다'
+        console.log('로그인 실패:', errorMsg)
+        setError(errorMsg)
       }
     } catch (err) {
-      console.error('Login error:', err)
+      console.error('로그인 오류:', err)
       setError('네트워크 오류가 발생했습니다')
     } finally {
       setLoading(false)
@@ -65,16 +73,16 @@ export default function LoginPage() {
           <p className="text-gray-600 mt-2">팀원 일정 관리 시스템</p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleLogin} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               직원 선택
             </label>
             <select
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">선택하세요</option>
               {employees.map((emp) => (
@@ -86,47 +94,55 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               비밀번호
             </label>
-            <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              placeholder="비밀번호"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+
+            <div className="mt-2 flex items-center gap-2">
               <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                placeholder="비밀번호"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                type="checkbox"
+                id="showPassword"
+                checked={showPassword}
+                onChange={(e) => setShowPassword(e.target.checked)}
+                className="w-4 h-4 text-blue-600 rounded cursor-pointer"
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-600 hover:text-gray-900"
-              >
-                {showPassword ? '숨기기' : '표시'}
-              </button>
+              <label htmlFor="showPassword" className="text-sm text-gray-600 cursor-pointer">
+                비밀번호 표시
+              </label>
             </div>
           </div>
 
           {error && (
             <div className="p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
-              {error}
+              ❌ {error}
             </div>
           )}
 
           <button
             type="submit"
-            disabled={loading}
-            className="w-full py-2 px-4 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition"
+            disabled={loading || !name || !password}
+            className="w-full py-2 px-4 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
           >
             {loading ? '로그인 중...' : '로그인'}
           </button>
         </form>
 
-        <div className="mt-6 p-4 bg-gray-100 rounded">
+        <div className="mt-6 p-4 bg-blue-50 rounded border border-blue-200">
           <p className="text-xs font-semibold text-gray-700 mb-2">📝 로그인 정보:</p>
-          <p className="text-xs text-gray-600"><strong>관리자:</strong> admin123</p>
-          <p className="text-xs text-gray-600"><strong>직원:</strong> 1234</p>
+          <p className="text-xs text-gray-600 mb-1">
+            <strong>관리자:</strong> <code className="bg-white px-2 py-1 rounded text-blue-600">admin123</code>
+          </p>
+          <p className="text-xs text-gray-600">
+            <strong>직원:</strong> <code className="bg-white px-2 py-1 rounded text-blue-600">1234</code>
+          </p>
         </div>
       </div>
     </div>
