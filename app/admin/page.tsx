@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 
 interface Employee {
   id: string
@@ -12,37 +11,38 @@ interface Employee {
 }
 
 export default function AdminPage() {
-  const router = useRouter()
   const [employees, setEmployees] = useState<Employee[]>([])
   const [newName, setNewName] = useState('')
   const [newEmail, setNewEmail] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
+  const [isAuthorized, setIsAuthorized] = useState(false)
 
   // 관리자 확인 및 직원 목록 로드
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const userStr = localStorage.getItem('user')
       if (!userStr) {
-        router.push('/login')
+        window.location.href = '/login'
         return
       }
 
       try {
         const userData = JSON.parse(userStr)
         if (userData.role !== 'admin') {
-          router.push('/')
+          window.location.href = '/'
           return
         }
 
+        setIsAuthorized(true)
         fetchEmployees()
       } catch (e) {
         console.error('Failed to parse user:', e)
-        router.push('/login')
+        window.location.href = '/login'
       }
     }
-  }, [router])
+  }, [])
 
   const fetchEmployees = async () => {
     try {
@@ -144,6 +144,10 @@ export default function AdminPage() {
     'bg-amber-500',
     'bg-emerald-500',
   ]
+
+  if (!isAuthorized) {
+    return <div className="flex items-center justify-center h-screen">확인 중...</div>
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">

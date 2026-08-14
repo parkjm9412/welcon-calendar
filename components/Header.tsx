@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { getMonthName } from '@/lib/calendar-utils'
 
@@ -24,7 +23,6 @@ export default function Header({
   onNextMonth,
   onToday,
 }: HeaderProps) {
-  const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
@@ -42,7 +40,7 @@ export default function Header({
 
   const handleLogout = () => {
     localStorage.removeItem('user')
-    router.push('/login')
+    window.location.href = '/login'
   }
 
   return (
