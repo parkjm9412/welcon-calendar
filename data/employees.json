@@ -7,50 +7,5 @@
     "password": "admin123",
     "role": "admin",
     "created_at": "2026-08-13T09:08:15.649Z"
-  },
-  {
-    "id": "88d17202-f922-4c67-ac4f-6728bd50c5ff",
-    "name": "최지은",
-    "email": "jieun@welconsystems.com",
-    "color_index": 3,
-    "password": "1234",
-    "role": "user",
-    "created_at": "2026-08-13T09:08:15.649Z"
-  },
-  {
-    "id": "72cea712-dcfc-4302-be73-a4aa8b83e5bf",
-    "name": "정준호",
-    "email": "junho@welconsystems.com",
-    "color_index": 4,
-    "password": "1234",
-    "role": "user",
-    "created_at": "2026-08-13T09:08:15.649Z"
-  },
-  {
-    "id": "789db5dc-7bf9-4bf6-b563-12d4b8ecfa02",
-    "name": "강미영",
-    "email": "miyoung@welconsystems.com",
-    "color_index": 5,
-    "password": "1234",
-    "role": "user",
-    "created_at": "2026-08-13T09:08:15.649Z"
-  },
-  {
-    "id": "0b3f60d7-dd1e-43f7-bb8f-061e53bbb924",
-    "name": "이광순",
-    "email": "kwangsoon@welconsystems.com",
-    "color_index": 6,
-    "password": "1234",
-    "role": "user",
-    "created_at": "2026-08-13T09:08:15.649Z"
-  },
-  {
-    "id": "ad58ae52-ab4b-42cf-8cdf-d8ee811731f9",
-    "name": "현수빈",
-    "email": "subin@welconsystems.com",
-    "color_index": 7,
-    "password": "1234",
-    "role": "user",
-    "created_at": "2026-08-13T09:08:15.649Z"
   }
 ]

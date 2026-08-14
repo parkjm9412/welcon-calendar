@@ -56,6 +56,13 @@ export async function DELETE(
       return Response.json({ message: '직원을 찾을 수 없습니다' }, { status: 404 })
     }
 
+    // 관리자는 삭제 불가
+    const deletedEmployee = employees.find((e: any) => e.id === id)
+    if (deletedEmployee?.role === 'admin') {
+      console.log('관리자는 삭제할 수 없습니다')
+      return Response.json({ message: '관리자는 삭제할 수 없습니다' }, { status: 403 })
+    }
+
     fs.writeFileSync(employeesFile, JSON.stringify(filtered, null, 2), 'utf-8')
     clearEmployeesCache() // 캐시 초기화
     console.log('삭제 완료:', id)

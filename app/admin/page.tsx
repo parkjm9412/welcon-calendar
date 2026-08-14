@@ -302,7 +302,8 @@ export default function AdminPage() {
                       type="checkbox"
                       checked={selected.includes(emp.id)}
                       onChange={() => handleToggleSelect(emp.id)}
-                      className="w-4 h-4 text-blue-600 rounded cursor-pointer"
+                      disabled={emp.role === 'admin'}
+                      className="w-4 h-4 text-blue-600 rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                   </td>
                   <td className="px-6 py-4">
