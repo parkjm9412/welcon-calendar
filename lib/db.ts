@@ -1,7 +1,10 @@
 import fs from 'fs'
 import path from 'path'
 
-const dataDir = path.join(process.cwd(), 'data')
+// Vercel 서버리스 환경에서는 /tmp 사용, 로컬에서는 data 디렉토리 사용
+const dataDir = process.env.VERCEL
+  ? '/tmp/welcon-data'
+  : path.join(process.cwd(), 'data')
 const employeesFile = path.join(dataDir, 'employees.json')
 const eventsFile = path.join(dataDir, 'events.json')
 
