@@ -36,9 +36,9 @@ export default function LoginPage() {
       if (res.ok && data.employee) {
         console.log('로그인 성공:', data.employee)
         localStorage.setItem('user', JSON.stringify(data.employee))
-        setTimeout(() => {
-          window.location.href = '/'
-        }, 500)
+        console.log('localStorage 저장 확인:', localStorage.getItem('user'))
+        // setTimeout 제거 - 즉시 리다이렉트
+        window.location.href = '/'
       } else {
         const errorMsg = data.message || '로그인 실패했습니다'
         console.log('로그인 실패:', errorMsg)
