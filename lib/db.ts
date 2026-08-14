@@ -14,8 +14,9 @@ export async function getEmployees() {
 
   if (error) {
     console.error('직원 조회 오류:', error)
-    return []
+    console.error('Error details:', JSON.stringify(error))
   }
+  console.log('Got employees:', data)
   return data || []
 }
 
@@ -29,8 +30,10 @@ export async function addEmployee(name: string, email: string, colorIndex: numbe
 
   if (error) {
     console.error('직원 추가 오류:', error)
+    console.error('Error details:', JSON.stringify(error))
     return null
   }
+  console.log('Added employee:', data)
   return data
 }
 
