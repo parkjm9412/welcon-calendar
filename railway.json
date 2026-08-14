@@ -7,6 +7,10 @@
   "deploy": {
     "startCommand": "npm run start",
     "restartPolicyType": "on_failure",
-    "restartPolicyMaxRetries": 5
+    "restartPolicyMaxRetries": 5,
+    "variables": {
+      "NEXT_PUBLIC_SUPABASE_URL": "https://ayviqkbjmmydnvszwwcs.supabase.co",
+      "NEXT_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_Fv4d8Lm6qXF-c1TMHH-Wew_gIJ1Ilau"
+    }
   }
 }
