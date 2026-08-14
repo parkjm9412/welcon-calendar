@@ -18,7 +18,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [isAuthorized, setIsAuthorized] = useState(false)
-  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [selected, setSelected] = useState<string[]>([])
 
   // 관리자 확인 및 직원 목록 로드
   useEffect(() => {
@@ -132,32 +132,30 @@ export default function AdminPage() {
 
   // 체크박스 토글
   const handleToggleSelect = (id: string) => {
-    const newSelected = new Set(selected)
-    if (newSelected.has(id)) {
-      newSelected.delete(id)
+    if (selected.includes(id)) {
+      setSelected(selected.filter((empId) => empId !== id))
     } else {
-      newSelected.add(id)
+      setSelected([...selected, id])
     }
-    setSelected(newSelected)
   }
 
   // 모두 선택
   const handleSelectAll = () => {
-    if (selected.size === employees.length) {
-      setSelected(new Set())
+    if (selected.length === employees.length) {
+      setSelected([])
     } else {
-      setSelected(new Set(employees.map((emp) => emp.id)))
+      setSelected(employees.map((emp) => emp.id))
     }
   }
 
   // 선택된 직원 일괄 삭제
   const handleBulkDelete = async () => {
-    if (selected.size === 0) {
+    if (selected.length === 0) {
       setMessage('❌ 삭제할 직원을 선택해주세요')
       return
     }
 
-    if (!confirm(`${selected.size}명의 직원을 정말 삭제하시겠습니까?`)) return
+    if (!confirm(`${selected.length}명의 직원을 정말 삭제하시겠습니까?`)) return
 
     setLoading(true)
     try {
@@ -172,7 +170,7 @@ export default function AdminPage() {
       }
 
       setMessage(`✅ ${successCount}명의 직원이 삭제되었습니다`)
-      setSelected(new Set())
+      setSelected([])
       fetchEmployees()
     } catch (error) {
       setMessage('❌ 삭제 중 오류가 발생했습니다')
@@ -248,10 +246,10 @@ export default function AdminPage() {
 
         {/* 직원 목록 */}
         <div className="bg-white rounded-lg shadow overflow-hidden mb-6">
-          {selected.size > 0 && (
+          {selected.length > 0 && (
             <div className="bg-blue-50 border-b border-blue-200 px-6 py-3 flex items-center justify-between">
               <span className="font-medium text-blue-900">
-                {selected.size}명 선택됨
+                {selected.length}명 선택됨
               </span>
               <button
                 onClick={handleBulkDelete}
@@ -268,7 +266,7 @@ export default function AdminPage() {
                 <th className="px-4 py-3 text-center w-12">
                   <input
                     type="checkbox"
-                    checked={selected.size > 0 && selected.size === employees.length}
+                    checked={selected.length > 0 && selected.length === employees.length}
                     onChange={handleSelectAll}
                     className="w-4 h-4 text-blue-600 rounded cursor-pointer"
                   />
@@ -285,13 +283,13 @@ export default function AdminPage() {
                 <tr
                   key={emp.id}
                   className={`border-b hover:bg-gray-50 ${
-                    selected.has(emp.id) ? 'bg-blue-50' : ''
+                    selected.includes(emp.id) ? 'bg-blue-50' : ''
                   }`}
                 >
                   <td className="px-4 py-4 text-center">
                     <input
                       type="checkbox"
-                      checked={selected.has(emp.id)}
+                      checked={selected.includes(emp.id)}
                       onChange={() => handleToggleSelect(emp.id)}
                       className="w-4 h-4 text-blue-600 rounded cursor-pointer"
                     />
