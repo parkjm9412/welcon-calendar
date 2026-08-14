@@ -17,8 +17,11 @@ export async function POST(request: Request) {
       )
     }
 
-    // emoji와 특수문자 제거
-    const cleanName = name.replace(/[^a-zA-Z0-9가-힣]/g, '').trim()
+    // 한글 이름만 추출 (로그인 페이지와 동일한 로직)
+    const cleanName = name
+      .replace(/\([^)]*\)/g, '') // (관리자) 같은 괄호 제거
+      .replace(/[^가-힣]/g, '') // 한글만 남김
+      .trim()
     console.log('정리된 이름:', { original: name, cleaned: cleanName })
 
     const employees: any[] = getEmployees()
