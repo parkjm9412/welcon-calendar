@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import Calendar from '@/components/Calendar'
 import EventModal from '@/components/EventModal'
@@ -10,7 +9,6 @@ import Sidebar from '@/components/Sidebar'
 import { CalendarEvent, Employee } from '@/types'
 
 export default function Home() {
-  const router = useRouter()
   const [currentDate, setCurrentDate] = useState(new Date())
   const [employees, setEmployees] = useState<Employee[]>([])
   const [events, setEvents] = useState<CalendarEvent[]>([])
@@ -18,22 +16,27 @@ export default function Home() {
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [isLoggedIn, setIsLoggedIn] = useState(true)
 
   // 로그인 확인
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const userStr = localStorage.getItem('user')
       if (!userStr) {
-        router.push('/login')
+        setIsLoggedIn(false)
+        window.location.href = '/login'
         return
       }
+      setIsLoggedIn(true)
     }
-  }, [router])
+  }, [])
 
   // Fetch employees and events on mount and when date changes
   useEffect(() => {
-    fetchData()
-  }, [currentDate])
+    if (isLoggedIn) {
+      fetchData()
+    }
+  }, [currentDate, isLoggedIn])
 
   const fetchData = async () => {
     setLoading(true)
@@ -143,6 +146,10 @@ export default function Home() {
         </div>
       </div>
     )
+  }
+
+  if (!isLoggedIn) {
+    return <div className="flex items-center justify-center h-screen">로그인 중...</div>
   }
 
   return (
