@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getEmployees, addEmployee } from '@/lib/db'
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const employees = getEmployees()
+    const employees = await getEmployees()
     return NextResponse.json(employees)
   } catch (error) {
     console.error('Failed to fetch employees:', error)
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const employee = addEmployee(name, email, color_index || 0)
+    const employee = await addEmployee(name, email, color_index || 0)
     return NextResponse.json(employee, { status: 201 })
   } catch (error) {
     console.error('Failed to create employee:', error)

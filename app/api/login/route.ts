@@ -1,10 +1,7 @@
-import { getEmployees, initializeDatabase } from '@/lib/db'
+import { getEmployees } from '@/lib/db'
 
 export async function POST(request: Request) {
   try {
-    // 데이터베이스 초기화 (반드시 먼저)
-    await initializeDatabase()
-
     let { name, password } = await request.json()
 
     console.log('로그인 요청:', { name, password })

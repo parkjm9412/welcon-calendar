@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     const startDate = searchParams.get('startDate')
     const endDate = searchParams.get('endDate')
 
-    const events = getEvents(startDate || undefined, endDate || undefined)
+    const events = await getEvents(startDate || undefined, endDate || undefined)
     return NextResponse.json(events)
   } catch (error) {
     console.error('Failed to fetch events:', error)
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const event = addEvent(title, description, start_date, end_date, employee_id, all_day || false)
+    const event = await addEvent(title, description, start_date, end_date, employee_id, all_day || false)
     return NextResponse.json(event, { status: 201 })
   } catch (error) {
     console.error('Failed to create event:', error)
@@ -53,7 +53,7 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    const event = updateEvent(id, title, description, start_date, end_date, employee_id, all_day)
+    const event = await updateEvent(id, title, description, start_date, end_date, employee_id, all_day)
     return NextResponse.json(event)
   } catch (error) {
     console.error('Failed to update event:', error)
@@ -76,7 +76,7 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    deleteEvent(id)
+    await deleteEvent(id)
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Failed to delete event:', error)
