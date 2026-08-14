@@ -48,7 +48,7 @@ export function initializeDatabase() {
   const employees = readJsonFile(employeesFile, [])
   if (employees.length === 0) {
     const defaultEmployees = [
-      { id: generateId(), name: '관리자', email: 'admin@welconsystems.com', color_index: -1, password: 'admin123', role: 'admin', created_at: new Date().toISOString() },
+      { id: generateId(), name: '박종미', email: 'jongmi@welconsystems.com', color_index: -1, password: 'admin123', role: 'admin', created_at: new Date().toISOString() },
       { id: generateId(), name: '김철수', email: 'chulsu@welconsystems.com', color_index: 0, password: '1234', role: 'user', created_at: new Date().toISOString() },
       { id: generateId(), name: '이영희', email: 'younghee@welconsystems.com', color_index: 1, password: '1234', role: 'user', created_at: new Date().toISOString() },
       { id: generateId(), name: '박민준', email: 'minjun@welconsystems.com', color_index: 2, password: '1234', role: 'user', created_at: new Date().toISOString() },
