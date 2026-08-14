@@ -1,117 +1,90 @@
-import Database from 'better-sqlite3'
-import path from 'path'
-import fs from 'fs'
-import { v4 as uuidv4 } from 'uuid'
+import { createClient } from '@supabase/supabase-js'
 
-const dbPath = path.join(process.cwd(), 'data', 'calendar.db')
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-// 디렉토리 생성
-if (!fs.existsSync(path.join(process.cwd(), 'data'))) {
-  fs.mkdirSync(path.join(process.cwd(), 'data'), { recursive: true })
-}
-
-export const db = new Database(dbPath)
-
-// 테이블 생성
-export function initializeDatabase() {
-  // Employees 테이블
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS employees (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      email TEXT NOT NULL UNIQUE,
-      color_index INTEGER DEFAULT 0,
-      created_at TEXT NOT NULL
-    )
-  `)
-
-  // Events 테이블
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS events (
-      id TEXT PRIMARY KEY,
-      title TEXT NOT NULL,
-      description TEXT,
-      start_date TEXT NOT NULL,
-      end_date TEXT NOT NULL,
-      employee_id TEXT NOT NULL,
-      all_day INTEGER DEFAULT 0,
-      created_at TEXT NOT NULL,
-      updated_at TEXT NOT NULL,
-      FOREIGN KEY(employee_id) REFERENCES employees(id)
-    )
-  `)
-
-  // 샘플 직원 데이터 추가 (처음 한 번만)
-  const employeeCount = db
-    .prepare('SELECT COUNT(*) as count FROM employees')
-    .get() as { count: number }
-
-  if (employeeCount.count === 0) {
-    const employees = [
-      { name: '박상덕', email: 'sdpark@welconsystems.com', color: 0 },
-      { name: '박기덕', email: 'ican6070@welconsystems.com', color: 1 },
-      { name: '신은철', email: 'ecshin@welconsystems.com', color: 2 },
-      { name: '윤은정', email: 'yej@welconsystems.com', color: 3 },
-      { name: '강충구', email: 'kcg@welconsystems.com', color: 4 },
-      { name: '옥순권', email: 'sko@welconsystems.com', color: 5 },
-      { name: '신동관', email: 'shingun@welconsystems.com', color: 6 },
-      { name: '김소연', email: 'ksy@welconsystems.com', color: 7 },
-      { name: '강선호', email: 'ksh@welconsystems.com', color: 8 },
-      { name: '박태수', email: 'pts5007@welconsystems.com', color: 9 },
-      { name: '박석현', email: 'psh@welconsystems.com', color: 10 },
-      { name: '김요한', email: 'kyh@welconsystems.com', color: 11 },
-    ]
-
-    const insert = db.prepare(
-      'INSERT INTO employees (id, name, email, color_index, created_at) VALUES (?, ?, ?, ?, ?)'
-    )
-
-    employees.forEach((emp) => {
-      insert.run(uuidv4(), emp.name, emp.email, emp.color, new Date().toISOString())
-    })
-  }
-
-  console.log('✅ 데이터베이스 초기화 완료')
-}
+export const supabase = createClient(supabaseUrl, supabaseKey)
 
 // 직원 조회
-export function getEmployees() {
-  return db
-    .prepare('SELECT * FROM employees ORDER BY created_at ASC')
-    .all()
+export async function getEmployees() {
+  const { data, error } = await supabase
+    .from('employees')
+    .select('*')
+    .order('created_at', { ascending: true })
+
+  if (error) {
+    console.error('직원 조회 오류:', error)
+    return []
+  }
+  return data || []
 }
 
 // 직원 추가
-export function addEmployee(name: string, email: string, colorIndex: number) {
-  const id = uuidv4()
-  db.prepare(
-    'INSERT INTO employees (id, name, email, color_index, created_at) VALUES (?, ?, ?, ?, ?)'
-  ).run(id, name, email, colorIndex, new Date().toISOString())
-  return { id, name, email, color_index: colorIndex, created_at: new Date().toISOString() }
+export async function addEmployee(name: string, email: string, colorIndex: number) {
+  const { data, error } = await supabase
+    .from('employees')
+    .insert([{ name, email, color_index: colorIndex }])
+    .select()
+    .single()
+
+  if (error) {
+    console.error('직원 추가 오류:', error)
+    return null
+  }
+  return data
+}
+
+// 직원 삭제
+export async function deleteEmployee(id: string) {
+  const { error } = await supabase
+    .from('employees')
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    console.error('직원 삭제 오류:', error)
+    return false
+  }
+  return true
+}
+
+// 직원 비밀번호 업데이트
+export async function updateEmployeePassword(id: string, password: string) {
+  const { error } = await supabase
+    .from('employees')
+    .update({ password })
+    .eq('id', id)
+
+  if (error) {
+    console.error('비밀번호 업데이트 오류:', error)
+    return false
+  }
+  return true
 }
 
 // 일정 조회
-export function getEvents(startDate?: string, endDate?: string) {
-  let query = 'SELECT * FROM events WHERE 1=1'
-  const params: string[] = []
+export async function getEvents(startDate?: string, endDate?: string) {
+  let query = supabase.from('events').select('*')
 
   if (startDate) {
-    query += ' AND start_date >= ?'
-    params.push(startDate)
+    query = query.gte('start_date', startDate)
   }
 
   if (endDate) {
-    query += ' AND end_date <= ?'
-    params.push(endDate)
+    query = query.lte('end_date', endDate)
   }
 
-  query += ' ORDER BY start_date ASC'
+  const { data, error } = await query.order('start_date', { ascending: true })
 
-  return db.prepare(query).all(...params)
+  if (error) {
+    console.error('일정 조회 오류:', error)
+    return []
+  }
+  return data || []
 }
 
 // 일정 추가
-export function addEvent(
+export async function addEvent(
   title: string,
   description: string | undefined,
   startDate: string,
@@ -119,27 +92,30 @@ export function addEvent(
   employeeId: string,
   allDay: boolean
 ) {
-  const id = uuidv4()
-  const now = new Date().toISOString()
-  db.prepare(
-    'INSERT INTO events (id, title, description, start_date, end_date, employee_id, all_day, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
-  ).run(id, title, description || '', startDate, endDate, employeeId, allDay ? 1 : 0, now, now)
+  const { data, error } = await supabase
+    .from('events')
+    .insert([
+      {
+        title,
+        description: description || '',
+        start_date: startDate,
+        end_date: endDate,
+        employee_id: employeeId,
+        all_day: allDay,
+      },
+    ])
+    .select()
+    .single()
 
-  return {
-    id,
-    title,
-    description,
-    start_date: startDate,
-    end_date: endDate,
-    employee_id: employeeId,
-    all_day: allDay,
-    created_at: now,
-    updated_at: now,
+  if (error) {
+    console.error('일정 추가 오류:', error)
+    return null
   }
+  return data
 }
 
 // 일정 수정
-export function updateEvent(
+export async function updateEvent(
   id: string,
   title: string,
   description: string | undefined,
@@ -148,25 +124,37 @@ export function updateEvent(
   employeeId: string,
   allDay: boolean
 ) {
-  const now = new Date().toISOString()
-  db.prepare(
-    'UPDATE events SET title = ?, description = ?, start_date = ?, end_date = ?, employee_id = ?, all_day = ?, updated_at = ? WHERE id = ?'
-  ).run(title, description || '', startDate, endDate, employeeId, allDay ? 1 : 0, now, id)
+  const { data, error } = await supabase
+    .from('events')
+    .update({
+      title,
+      description: description || '',
+      start_date: startDate,
+      end_date: endDate,
+      employee_id: employeeId,
+      all_day: allDay,
+    })
+    .eq('id', id)
+    .select()
+    .single()
 
-  return {
-    id,
-    title,
-    description,
-    start_date: startDate,
-    end_date: endDate,
-    employee_id: employeeId,
-    all_day: allDay,
-    created_at: new Date().toISOString(),
-    updated_at: now,
+  if (error) {
+    console.error('일정 수정 오류:', error)
+    return null
   }
+  return data
 }
 
 // 일정 삭제
-export function deleteEvent(id: string) {
-  db.prepare('DELETE FROM events WHERE id = ?').run(id)
+export async function deleteEvent(id: string) {
+  const { error } = await supabase
+    .from('events')
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    console.error('일정 삭제 오류:', error)
+    return false
+  }
+  return true
 }
