@@ -14,8 +14,8 @@ export async function POST(request: Request) {
       )
     }
 
-    // emoji 제거
-    name = name.replace(/[^a-zA-Z0-9가-힣\s]/g, '').trim()
+    // emoji와 특수문자 제거, 공백도 제거
+    name = name.replace(/[^a-zA-Z0-9가-힣]/g, '').trim()
 
     const employees: any[] = getEmployees()
     const employee = employees.find((e: any) => e.name === name)
