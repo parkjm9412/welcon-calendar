@@ -1,8 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import Sidebar from '@/components/Sidebar'
-import { Employee } from '@/types'
+export default function EmployeesPage() {
+  return (
+    <div className="flex items-center justify-center h-screen">
+      <p>직원 페이지</p>
+    </div>
+  )
+}
 import { getEmployeeColor } from '@/lib/calendar-utils'
 
 export default function EmployeesPage() {
