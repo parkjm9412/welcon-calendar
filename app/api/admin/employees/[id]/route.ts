@@ -67,7 +67,7 @@ export async function DELETE(
     clearEmployeesCache() // 캐시 초기화
     console.log('삭제 완료:', id)
 
-    return Response.json({ message: '직원이 삭제되었습니다' })
+    return Response.json({ message: '직원이 삭제되었습니다' }, { status: 200 })
   } catch (error) {
     console.error('DELETE 에러:', error)
     return Response.json({ message: '오류 발생' }, { status: 500 })
