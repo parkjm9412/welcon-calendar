@@ -26,29 +26,52 @@ export default function LoginPage() {
       const data = await res.json()
 
       if (res.ok) {
-        localStorage.setItem('user', JSON.stringify(data.employee))
-        router.push('/')
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('user', JSON.stringify(data.employee))
+          setTimeout(() => {
+            router.push('/')
+          }, 100)
+        }
       } else {
         setError(data.message || '로그인 실패')
       }
     } catch (err) {
       setError('오류가 발생했습니다')
+      console.error(err)
     } finally {
       setLoading(false)
     }
   }
 
+  const employees = [
+    '🔐 박종미 (관리자)',
+    '김철수',
+    '이영희',
+    '박민준',
+    '최지은',
+    '정준호',
+    '강미영',
+    '이광순',
+    '현수빈',
+    '송민정',
+    '한승준',
+    '조세희',
+    '윤나영',
+    '배지현',
+  ]
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
-        <h1 className="text-3xl font-bold text-center mb-8 text-gray-900">
+        <h1 className="text-3xl font-bold text-center mb-2 text-gray-900">
           🗓️ Welcon Calendar
         </h1>
+        <p className="text-center text-gray-600 mb-8">팀원 일정 관리 시스템</p>
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              직원 이름
+              직원 선택
             </label>
             <select
               value={name}
@@ -56,20 +79,11 @@ export default function LoginPage() {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
             >
               <option value="">선택하세요</option>
-              <option>🔐 박종미 (관리자)</option>
-              <option>김철수</option>
-              <option>이영희</option>
-              <option>박민준</option>
-              <option>최지은</option>
-              <option>정준호</option>
-              <option>강미영</option>
-              <option>이광순</option>
-              <option>현수빈</option>
-              <option>송민정</option>
-              <option>한승준</option>
-              <option>조세희</option>
-              <option>윤나영</option>
-              <option>배지현</option>
+              {employees.map((emp) => (
+                <option key={emp} value={emp}>
+                  {emp}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -97,22 +111,28 @@ export default function LoginPage() {
 
           {error && (
             <div className="p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
-              {error}
+              ❌ {error}
             </div>
           )}
 
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition"
+            disabled={loading || !name || !password}
+            className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
             {loading ? '로그인 중...' : '로그인'}
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-600 mt-6">
-          관리자에게 비밀번호를 받으세요
-        </p>
+        <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <p className="text-sm text-gray-700 font-medium mb-2">📝 로그인 정보:</p>
+          <p className="text-sm text-gray-600">
+            <strong>관리자:</strong> admin123
+          </p>
+          <p className="text-sm text-gray-600">
+            <strong>직원:</strong> 1234
+          </p>
+        </div>
       </div>
     </div>
   )
