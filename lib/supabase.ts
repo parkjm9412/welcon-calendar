@@ -17,7 +17,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 export async function initializeDatabase() {
   try {
-    const { data, error } = await supabase.from('employees').select('count')
+    const { error } = await supabase.from('employees').select('count')
     if (error) {
       console.error('Database initialization error:', error)
       return false
