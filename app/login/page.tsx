@@ -15,12 +15,17 @@ export default function LoginPage() {
     setError('')
 
     try {
-      console.log('로그인 시도:', { name, password })
+      // 한글 이름만 추출 (괄호 제거 → 한글만 추출)
+      const cleanName = name
+        .replace(/\([^)]*\)/g, '') // (관리자) 같은 괄호 제거
+        .replace(/[^가-힣]/g, '') // 한글만 남김
+        .trim()
+      console.log('로그인 시도:', { original: name, cleanName, password })
 
       const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, password }),
+        body: JSON.stringify({ name: cleanName, password }),
       })
 
       console.log('응답 상태:', res.status)
