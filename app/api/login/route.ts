@@ -3,7 +3,7 @@ import { getEmployees, initializeDatabase } from '@/lib/db'
 export async function POST(request: Request) {
   try {
     // 데이터베이스 초기화 (반드시 먼저)
-    initializeDatabase()
+    await initializeDatabase()
 
     let { name, password } = await request.json()
 
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
       .trim()
     console.log('정리된 이름:', { original: name, cleaned: cleanName })
 
-    const employees: any[] = getEmployees()
+    const employees: any[] = await getEmployees()
     console.log('직원 목록 개수:', employees.length)
     console.log('직원 목록:', employees.map((e: any) => ({ id: e.id, name: e.name })))
 

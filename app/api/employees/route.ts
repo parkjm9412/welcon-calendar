@@ -4,9 +4,9 @@ import { getEmployees, addEmployee, initializeDatabase } from '@/lib/db'
 export async function GET() {
   try {
     // 데이터베이스 초기화 (첫 실행 시)
-    initializeDatabase()
+    await initializeDatabase()
 
-    const employees = getEmployees()
+    const employees = await getEmployees()
     return NextResponse.json(employees)
   } catch (error) {
     console.error('Failed to fetch employees:', error)
