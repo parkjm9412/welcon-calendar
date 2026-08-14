@@ -4,12 +4,13 @@ import path from 'path'
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const { password } = await request.json()
     const employees: any[] = getEmployees()
-    const employee = employees.find((e: any) => e.id === params.id)
+    const employee = employees.find((e: any) => e.id === id)
 
     if (!employee) {
       return Response.json({ message: '직원을 찾을 수 없습니다' }, { status: 404 })
@@ -28,11 +29,12 @@ export async function PUT(
 
 export async function DELETE(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const employees: any[] = getEmployees()
-    const filtered = employees.filter((e: any) => e.id !== params.id)
+    const filtered = employees.filter((e: any) => e.id !== id)
 
     if (filtered.length === employees.length) {
       return Response.json({ message: '직원을 찾을 수 없습니다' }, { status: 404 })

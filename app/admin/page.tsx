@@ -150,12 +150,18 @@ export default function AdminPage() {
 
   // 선택된 직원 일괄 삭제
   const handleBulkDelete = async () => {
+    console.log('handleBulkDelete 호출됨, selected:', selected)
     if (selected.length === 0) {
       setMessage('❌ 삭제할 직원을 선택해주세요')
       return
     }
 
-    if (!confirm(`${selected.length}명의 직원을 정말 삭제하시겠습니까?`)) return
+    console.log('확인 다이얼로그 표시 중...')
+    if (!confirm(`${selected.length}명의 직원을 정말 삭제하시겠습니까?`)) {
+      console.log('사용자가 취소함')
+      return
+    }
+    console.log('삭제 진행 중...')
 
     setLoading(true)
     try {
