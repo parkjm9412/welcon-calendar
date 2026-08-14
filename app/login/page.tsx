@@ -39,7 +39,7 @@ export default function LoginPage() {
         console.log('로그인 성공:', data.employee)
         localStorage.setItem('user', JSON.stringify(data.employee))
         console.log('localStorage 저장 확인:', localStorage.getItem('user'))
-        router.push('/')
+        window.location.href = '/'
       } else {
         const errorMsg = data.message || '로그인 실패했습니다'
         console.log('로그인 실패:', errorMsg)
