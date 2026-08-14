@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import Calendar from '@/components/Calendar'
 import EventModal from '@/components/EventModal'
@@ -9,6 +10,7 @@ import Sidebar from '@/components/Sidebar'
 import { CalendarEvent, Employee } from '@/types'
 
 export default function Home() {
+  const router = useRouter()
   const [currentDate, setCurrentDate] = useState(new Date())
   const [employees, setEmployees] = useState<Employee[]>([])
   const [events, setEvents] = useState<CalendarEvent[]>([])
@@ -16,6 +18,15 @@ export default function Home() {
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [loading, setLoading] = useState(true)
+
+  // 로그인 확인
+  useEffect(() => {
+    const userStr = localStorage.getItem('user')
+    if (!userStr) {
+      router.push('/login')
+      return
+    }
+  }, [router])
 
   // Fetch employees and events on mount and when date changes
   useEffect(() => {
