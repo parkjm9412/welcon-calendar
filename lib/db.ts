@@ -7,7 +7,6 @@ const eventsFile = path.join(dataDir, 'events.json')
 
 // 메모리 캐시 (Vercel 서버리스 환경에서 사용)
 let employeesCache: any[] | null = null
-let eventCache: any[] | null = null
 
 // 캐시 초기화 함수
 export function clearEmployeesCache() {
