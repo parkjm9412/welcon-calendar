@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
+  const router = useRouter()
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -37,8 +39,7 @@ export default function LoginPage() {
         console.log('로그인 성공:', data.employee)
         localStorage.setItem('user', JSON.stringify(data.employee))
         console.log('localStorage 저장 확인:', localStorage.getItem('user'))
-        // setTimeout 제거 - 즉시 리다이렉트
-        window.location.href = '/'
+        router.push('/')
       } else {
         const errorMsg = data.message || '로그인 실패했습니다'
         console.log('로그인 실패:', errorMsg)
