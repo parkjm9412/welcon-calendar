@@ -18,6 +18,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [isAuthorized, setIsAuthorized] = useState(false)
+  const [selected, setSelected] = useState<Set<string>>(new Set())
 
   // 관리자 확인 및 직원 목록 로드
   useEffect(() => {
@@ -129,6 +130,57 @@ export default function AdminPage() {
     }
   }
 
+  // 체크박스 토글
+  const handleToggleSelect = (id: string) => {
+    const newSelected = new Set(selected)
+    if (newSelected.has(id)) {
+      newSelected.delete(id)
+    } else {
+      newSelected.add(id)
+    }
+    setSelected(newSelected)
+  }
+
+  // 모두 선택
+  const handleSelectAll = () => {
+    if (selected.size === employees.length) {
+      setSelected(new Set())
+    } else {
+      setSelected(new Set(employees.map((emp) => emp.id)))
+    }
+  }
+
+  // 선택된 직원 일괄 삭제
+  const handleBulkDelete = async () => {
+    if (selected.size === 0) {
+      setMessage('❌ 삭제할 직원을 선택해주세요')
+      return
+    }
+
+    if (!confirm(`${selected.size}명의 직원을 정말 삭제하시겠습니까?`)) return
+
+    setLoading(true)
+    try {
+      let successCount = 0
+      for (const id of selected) {
+        const res = await fetch(`/api/admin/employees/${id}`, {
+          method: 'DELETE',
+        })
+        if (res.ok) {
+          successCount++
+        }
+      }
+
+      setMessage(`✅ ${successCount}명의 직원이 삭제되었습니다`)
+      setSelected(new Set())
+      fetchEmployees()
+    } catch (error) {
+      setMessage('❌ 삭제 중 오류가 발생했습니다')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const colors = [
     'bg-red-500',
     'bg-blue-500',
@@ -195,10 +247,32 @@ export default function AdminPage() {
         </div>
 
         {/* 직원 목록 */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-white rounded-lg shadow overflow-hidden mb-6">
+          {selected.size > 0 && (
+            <div className="bg-blue-50 border-b border-blue-200 px-6 py-3 flex items-center justify-between">
+              <span className="font-medium text-blue-900">
+                {selected.size}명 선택됨
+              </span>
+              <button
+                onClick={handleBulkDelete}
+                disabled={loading}
+                className="px-4 py-2 bg-red-600 text-white rounded font-medium hover:bg-red-700 disabled:opacity-50"
+              >
+                {loading ? '삭제 중...' : '선택된 직원 삭제'}
+              </button>
+            </div>
+          )}
           <table className="w-full">
             <thead className="bg-gray-100 border-b">
               <tr>
+                <th className="px-4 py-3 text-center w-12">
+                  <input
+                    type="checkbox"
+                    checked={selected.size > 0 && selected.size === employees.length}
+                    onChange={handleSelectAll}
+                    className="w-4 h-4 text-blue-600 rounded cursor-pointer"
+                  />
+                </th>
                 <th className="px-6 py-3 text-left font-bold">색상</th>
                 <th className="px-6 py-3 text-left font-bold">이름</th>
                 <th className="px-6 py-3 text-left font-bold">이메일</th>
@@ -208,7 +282,20 @@ export default function AdminPage() {
             </thead>
             <tbody>
               {employees.map((emp) => (
-                <tr key={emp.id} className="border-b hover:bg-gray-50">
+                <tr
+                  key={emp.id}
+                  className={`border-b hover:bg-gray-50 ${
+                    selected.has(emp.id) ? 'bg-blue-50' : ''
+                  }`}
+                >
+                  <td className="px-4 py-4 text-center">
+                    <input
+                      type="checkbox"
+                      checked={selected.has(emp.id)}
+                      onChange={() => handleToggleSelect(emp.id)}
+                      className="w-4 h-4 text-blue-600 rounded cursor-pointer"
+                    />
+                  </td>
                   <td className="px-6 py-4">
                     <div
                       className={`w-6 h-6 rounded ${
