@@ -28,9 +28,15 @@ export default function Header({
   const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
-    const userStr = localStorage.getItem('user')
-    if (userStr) {
-      setUser(JSON.parse(userStr))
+    if (typeof window !== 'undefined') {
+      const userStr = localStorage.getItem('user')
+      if (userStr) {
+        try {
+          setUser(JSON.parse(userStr))
+        } catch (e) {
+          console.error('Failed to parse user:', e)
+        }
+      }
     }
   }, [])
 

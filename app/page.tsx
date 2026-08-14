@@ -21,10 +21,12 @@ export default function Home() {
 
   // 로그인 확인
   useEffect(() => {
-    const userStr = localStorage.getItem('user')
-    if (!userStr) {
-      router.push('/login')
-      return
+    if (typeof window !== 'undefined') {
+      const userStr = localStorage.getItem('user')
+      if (!userStr) {
+        router.push('/login')
+        return
+      }
     }
   }, [router])
 

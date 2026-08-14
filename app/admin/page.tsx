@@ -22,19 +22,26 @@ export default function AdminPage() {
 
   // 관리자 확인 및 직원 목록 로드
   useEffect(() => {
-    const userStr = localStorage.getItem('user')
-    if (!userStr) {
-      router.push('/login')
-      return
-    }
+    if (typeof window !== 'undefined') {
+      const userStr = localStorage.getItem('user')
+      if (!userStr) {
+        router.push('/login')
+        return
+      }
 
-    const userData = JSON.parse(userStr)
-    if (userData.role !== 'admin') {
-      router.push('/')
-      return
-    }
+      try {
+        const userData = JSON.parse(userStr)
+        if (userData.role !== 'admin') {
+          router.push('/')
+          return
+        }
 
-    fetchEmployees()
+        fetchEmployees()
+      } catch (e) {
+        console.error('Failed to parse user:', e)
+        router.push('/login')
+      }
+    }
   }, [router])
 
   const fetchEmployees = async () => {
