@@ -48,19 +48,20 @@ export function initializeDatabase() {
   const employees = readJsonFile(employeesFile, [])
   if (employees.length === 0) {
     const defaultEmployees = [
-      { id: generateId(), name: '김철수', email: 'chulsu@welconsystems.com', color_index: 0, password: '1234', created_at: new Date().toISOString() },
-      { id: generateId(), name: '이영희', email: 'younghee@welconsystems.com', color_index: 1, password: '1234', created_at: new Date().toISOString() },
-      { id: generateId(), name: '박민준', email: 'minjun@welconsystems.com', color_index: 2, password: '1234', created_at: new Date().toISOString() },
-      { id: generateId(), name: '최지은', email: 'jieun@welconsystems.com', color_index: 3, password: '1234', created_at: new Date().toISOString() },
-      { id: generateId(), name: '정준호', email: 'junho@welconsystems.com', color_index: 4, password: '1234', created_at: new Date().toISOString() },
-      { id: generateId(), name: '강미영', email: 'miyoung@welconsystems.com', color_index: 5, password: '1234', created_at: new Date().toISOString() },
-      { id: generateId(), name: '이광순', email: 'kwangsoon@welconsystems.com', color_index: 6, password: '1234', created_at: new Date().toISOString() },
-      { id: generateId(), name: '현수빈', email: 'subin@welconsystems.com', color_index: 7, password: '1234', created_at: new Date().toISOString() },
-      { id: generateId(), name: '송민정', email: 'minjeong@welconsystems.com', color_index: 8, password: '1234', created_at: new Date().toISOString() },
-      { id: generateId(), name: '한승준', email: 'seungjun@welconsystems.com', color_index: 9, password: '1234', created_at: new Date().toISOString() },
-      { id: generateId(), name: '조세희', email: 'sehee@welconsystems.com', color_index: 10, password: '1234', created_at: new Date().toISOString() },
-      { id: generateId(), name: '윤나영', email: 'nayoung@welconsystems.com', color_index: 11, password: '1234', created_at: new Date().toISOString() },
-      { id: generateId(), name: '배지현', email: 'jihyun@welconsystems.com', color_index: 12, password: '1234', created_at: new Date().toISOString() },
+      { id: generateId(), name: '관리자', email: 'admin@welconsystems.com', color_index: -1, password: 'admin123', role: 'admin', created_at: new Date().toISOString() },
+      { id: generateId(), name: '김철수', email: 'chulsu@welconsystems.com', color_index: 0, password: '1234', role: 'user', created_at: new Date().toISOString() },
+      { id: generateId(), name: '이영희', email: 'younghee@welconsystems.com', color_index: 1, password: '1234', role: 'user', created_at: new Date().toISOString() },
+      { id: generateId(), name: '박민준', email: 'minjun@welconsystems.com', color_index: 2, password: '1234', role: 'user', created_at: new Date().toISOString() },
+      { id: generateId(), name: '최지은', email: 'jieun@welconsystems.com', color_index: 3, password: '1234', role: 'user', created_at: new Date().toISOString() },
+      { id: generateId(), name: '정준호', email: 'junho@welconsystems.com', color_index: 4, password: '1234', role: 'user', created_at: new Date().toISOString() },
+      { id: generateId(), name: '강미영', email: 'miyoung@welconsystems.com', color_index: 5, password: '1234', role: 'user', created_at: new Date().toISOString() },
+      { id: generateId(), name: '이광순', email: 'kwangsoon@welconsystems.com', color_index: 6, password: '1234', role: 'user', created_at: new Date().toISOString() },
+      { id: generateId(), name: '현수빈', email: 'subin@welconsystems.com', color_index: 7, password: '1234', role: 'user', created_at: new Date().toISOString() },
+      { id: generateId(), name: '송민정', email: 'minjeong@welconsystems.com', color_index: 8, password: '1234', role: 'user', created_at: new Date().toISOString() },
+      { id: generateId(), name: '한승준', email: 'seungjun@welconsystems.com', color_index: 9, password: '1234', role: 'user', created_at: new Date().toISOString() },
+      { id: generateId(), name: '조세희', email: 'sehee@welconsystems.com', color_index: 10, password: '1234', role: 'user', created_at: new Date().toISOString() },
+      { id: generateId(), name: '윤나영', email: 'nayoung@welconsystems.com', color_index: 11, password: '1234', role: 'user', created_at: new Date().toISOString() },
+      { id: generateId(), name: '배지현', email: 'jihyun@welconsystems.com', color_index: 12, password: '1234', role: 'user', created_at: new Date().toISOString() },
     ]
     writeJsonFile(employeesFile, defaultEmployees)
   }

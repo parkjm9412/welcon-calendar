@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 interface Employee {
   id: string
@@ -10,7 +11,15 @@ interface Employee {
   color_index: number
 }
 
+interface User {
+  id: string
+  name: string
+  role: string
+}
+
 export default function AdminPage() {
+  const router = useRouter()
+  const [user, setUser] = useState<User | null>(null)
   const [employees, setEmployees] = useState<Employee[]>([])
   const [newName, setNewName] = useState('')
   const [newEmail, setNewEmail] = useState('')
@@ -18,10 +27,23 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
 
-  // 직원 목록 로드
+  // 관리자 확인 및 직원 목록 로드
   useEffect(() => {
+    const userStr = localStorage.getItem('user')
+    if (!userStr) {
+      router.push('/login')
+      return
+    }
+
+    const userData = JSON.parse(userStr)
+    if (userData.role !== 'admin') {
+      router.push('/')
+      return
+    }
+
+    setUser(userData)
     fetchEmployees()
-  }, [])
+  }, [router])
 
   const fetchEmployees = async () => {
     try {

@@ -2,7 +2,7 @@ import { getEmployees } from '@/lib/db'
 
 export async function POST(request: Request) {
   try {
-    const { name, password } = await request.json()
+    let { name, password } = await request.json()
 
     if (!name || !password) {
       return Response.json(
@@ -10,6 +10,9 @@ export async function POST(request: Request) {
         { status: 400 }
       )
     }
+
+    // emoji 제거
+    name = name.replace(/[^a-zA-Z0-9가-힣\s]/g, '').trim()
 
     const employees = getEmployees()
     const employee = employees.find((e) => e.name === name)
@@ -31,7 +34,12 @@ export async function POST(request: Request) {
 
     return Response.json({
       message: '로그인 성공',
-      employee: { id: employee.id, name: employee.name, color: employee.color },
+      employee: {
+        id: employee.id,
+        name: employee.name,
+        color: employee.color_index,
+        role: employee.role || 'user'
+      },
     })
   } catch (error) {
     return Response.json({ message: '오류 발생' }, { status: 500 })

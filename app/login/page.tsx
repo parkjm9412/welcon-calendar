@@ -55,6 +55,7 @@ export default function LoginPage() {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
             >
               <option value="">선택하세요</option>
+              <option>🔐 관리자</option>
               <option>김철수</option>
               <option>이영희</option>
               <option>박민준</option>
