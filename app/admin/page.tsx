@@ -8,6 +8,7 @@ interface Employee {
   email: string
   password: string
   color_index: number
+  role?: string
 }
 
 export default function AdminPage() {
