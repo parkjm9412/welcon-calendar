@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function LoginPage() {
   const [name, setName] = useState('')
@@ -8,6 +8,24 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [employees, setEmployees] = useState<string[]>([])
+
+  // Supabase에서 직원 목록 동적 로드
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const res = await fetch('/api/employees')
+        const data = await res.json()
+        const names = data.map((emp: any) =>
+          emp.role === 'admin' ? `🔐 ${emp.name} (관리자)` : emp.name
+        )
+        setEmployees(names)
+      } catch (err) {
+        console.error('직원 목록 로드 실패:', err)
+      }
+    }
+    fetchEmployees()
+  }, [])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -51,21 +69,6 @@ export default function LoginPage() {
     }
   }
 
-  const employees = [
-    '🔐 박종미 (관리자)',
-    '박상덕',
-    '박기덕',
-    '신은철',
-    '윤은정',
-    '강충구',
-    '옥순권',
-    '신동관',
-    '김소연',
-    '강선호',
-    '박태수',
-    '박석현',
-    '김요한',
-  ]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
