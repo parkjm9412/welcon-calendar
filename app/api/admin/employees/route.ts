@@ -1,4 +1,4 @@
-import { getEmployees, addEmployee, writeJsonFile } from '@/lib/db'
+import { getEmployees } from '@/lib/db'
 import fs from 'fs'
 import path from 'path'
 

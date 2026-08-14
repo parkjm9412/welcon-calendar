@@ -8,8 +8,8 @@ export async function PUT(
 ) {
   try {
     const { password } = await request.json()
-    const employees = getEmployees()
-    const employee = employees.find((e) => e.id === params.id)
+    const employees: any[] = getEmployees()
+    const employee = employees.find((e: any) => e.id === params.id)
 
     if (!employee) {
       return Response.json({ message: '직원을 찾을 수 없습니다' }, { status: 404 })
@@ -27,12 +27,12 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: Request,
+  _req: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const employees = getEmployees()
-    const filtered = employees.filter((e) => e.id !== params.id)
+    const employees: any[] = getEmployees()
+    const filtered = employees.filter((e: any) => e.id !== params.id)
 
     if (filtered.length === employees.length) {
       return Response.json({ message: '직원을 찾을 수 없습니다' }, { status: 404 })

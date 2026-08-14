@@ -14,8 +14,8 @@ export async function POST(request: Request) {
     // emoji 제거
     name = name.replace(/[^a-zA-Z0-9가-힣\s]/g, '').trim()
 
-    const employees = getEmployees()
-    const employee = employees.find((e) => e.name === name)
+    const employees: any[] = getEmployees()
+    const employee = employees.find((e: any) => e.name === name)
 
     if (!employee) {
       return Response.json(

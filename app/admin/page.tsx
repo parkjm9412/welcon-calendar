@@ -11,15 +11,8 @@ interface Employee {
   color_index: number
 }
 
-interface User {
-  id: string
-  name: string
-  role: string
-}
-
 export default function AdminPage() {
   const router = useRouter()
-  const [user, setUser] = useState<User | null>(null)
   const [employees, setEmployees] = useState<Employee[]>([])
   const [newName, setNewName] = useState('')
   const [newEmail, setNewEmail] = useState('')
@@ -41,7 +34,6 @@ export default function AdminPage() {
       return
     }
 
-    setUser(userData)
     fetchEmployees()
   }, [router])
 
