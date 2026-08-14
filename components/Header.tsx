@@ -40,7 +40,10 @@ export default function Header({
 
   const handleLogout = () => {
     localStorage.removeItem('user')
-    window.location.href = '/login'
+    sessionStorage.clear()
+    localStorage.clear()
+    // 페이지 캐시 무효화를 위해 reload 사용
+    window.location.href = '/login?logout=true'
   }
 
   return (
