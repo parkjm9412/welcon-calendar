@@ -1,6 +1,4 @@
-import { clearEmployeesCache } from '@/lib/db'
-import fs from 'fs'
-import path from 'path'
+import { supabase } from '@/lib/db'
 
 export async function PUT(
   request: Request,
@@ -10,24 +8,28 @@ export async function PUT(
     const { id } = await params
     const { password } = await request.json()
 
-    const dataDir = path.join(process.cwd(), 'data')
-    const employeesFile = path.join(dataDir, 'employees.json')
+    const { data: employee, error: fetchError } = await supabase
+      .from('employees')
+      .select('*')
+      .eq('id', id)
+      .single()
 
-    // 매번 최신 파일을 읽기 (캐시 사용 안 함)
-    const fileData = fs.readFileSync(employeesFile, 'utf-8')
-    const employees: any[] = JSON.parse(fileData)
-    const employee = employees.find((e: any) => e.id === id)
-
-    if (!employee) {
+    if (fetchError || !employee) {
       return Response.json({ message: '직원을 찾을 수 없습니다' }, { status: 404 })
     }
 
-    employee.password = password
-    fs.writeFileSync(employeesFile, JSON.stringify(employees, null, 2), 'utf-8')
-    clearEmployeesCache() // 캐시 초기화
+    const { error: updateError } = await supabase
+      .from('employees')
+      .update({ password })
+      .eq('id', id)
+
+    if (updateError) {
+      return Response.json({ message: '오류 발생' }, { status: 500 })
+    }
 
     return Response.json({ message: '비밀번호가 변경되었습니다' })
   } catch (error) {
+    console.error('PUT 에러:', error)
     return Response.json({ message: '오류 발생' }, { status: 500 })
   }
 }
@@ -40,33 +42,34 @@ export async function DELETE(
     const { id } = await params
     console.log('DELETE 요청:', id)
 
-    const dataDir = path.join(process.cwd(), 'data')
-    const employeesFile = path.join(dataDir, 'employees.json')
+    const { data: employee, error: fetchError } = await supabase
+      .from('employees')
+      .select('*')
+      .eq('id', id)
+      .single()
 
-    // 매번 최신 파일을 읽기 (캐시 사용 안 함)
-    const fileData = fs.readFileSync(employeesFile, 'utf-8')
-    const employees: any[] = JSON.parse(fileData)
-    console.log('현재 직원 수:', employees.length)
-
-    const filtered = employees.filter((e: any) => e.id !== id)
-    console.log('필터링 후 직원 수:', filtered.length)
-
-    if (filtered.length === employees.length) {
+    if (fetchError || !employee) {
       console.log('직원을 찾을 수 없음')
       return Response.json({ message: '직원을 찾을 수 없습니다' }, { status: 404 })
     }
 
     // 관리자는 삭제 불가
-    const deletedEmployee = employees.find((e: any) => e.id === id)
-    if (deletedEmployee?.role === 'admin') {
+    if (employee.role === 'admin') {
       console.log('관리자는 삭제할 수 없습니다')
       return Response.json({ message: '관리자는 삭제할 수 없습니다' }, { status: 403 })
     }
 
-    fs.writeFileSync(employeesFile, JSON.stringify(filtered, null, 2), 'utf-8')
-    clearEmployeesCache() // 캐시 초기화
-    console.log('삭제 완료:', id)
+    const { error: deleteError } = await supabase
+      .from('employees')
+      .delete()
+      .eq('id', id)
 
+    if (deleteError) {
+      console.error('DELETE 에러:', deleteError)
+      return Response.json({ message: '오류 발생' }, { status: 500 })
+    }
+
+    console.log('삭제 완료:', id)
     return Response.json({ message: '직원이 삭제되었습니다' }, { status: 200 })
   } catch (error) {
     console.error('DELETE 에러:', error)

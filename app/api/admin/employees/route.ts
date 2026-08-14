@@ -1,6 +1,4 @@
-import { getEmployees } from '@/lib/db'
-import fs from 'fs'
-import path from 'path'
+import { supabase } from '@/lib/db'
 
 export async function POST(request: Request) {
   try {
@@ -13,30 +11,33 @@ export async function POST(request: Request) {
       )
     }
 
-    const employees = getEmployees()
-    const colorIndex = employees.length % 13
+    const id = crypto.randomUUID()
 
-    // addEmployee 함수를 확장해서 password 포함
-    const newEmployee = {
-      id: require('crypto').randomUUID(),
-      name,
-      email: email || '',
-      password,
-      color_index: colorIndex,
-      created_at: new Date().toISOString(),
+    const { data, error } = await supabase
+      .from('employees')
+      .insert([
+        {
+          id,
+          name,
+          email: email || '',
+          password,
+          color_index: Math.floor(Math.random() * 13),
+          role: 'user',
+        },
+      ])
+      .select()
+
+    if (error) {
+      console.error('Error adding employee:', error)
+      return Response.json({ message: '오류 발생' }, { status: 500 })
     }
-
-    employees.push(newEmployee)
-
-    const dataDir = path.join(process.cwd(), 'data')
-    const employeesFile = path.join(dataDir, 'employees.json')
-    fs.writeFileSync(employeesFile, JSON.stringify(employees, null, 2), 'utf-8')
 
     return Response.json({
       message: '직원이 추가되었습니다',
-      employee: newEmployee,
+      employee: data?.[0],
     })
   } catch (error) {
+    console.error('POST 에러:', error)
     return Response.json({ message: '오류 발생' }, { status: 500 })
   }
 }
