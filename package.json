@@ -10,7 +10,6 @@
     "format": "oxfmt"
   },
   "dependencies": {
-    "@make-kits/wpf": "0.0.2",
     "@react-oauth/google": "^0.13.5",
     "@supabase/supabase-js": "^2.112.3",
     "react": "^19.0.0",
