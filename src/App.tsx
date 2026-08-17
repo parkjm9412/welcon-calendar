@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import { setupDatabase } from '@/lib/setupDatabase'
 import { useIsMobile } from './hooks/useIsMobile'
 import Login from './components/Login'
 import Sidebar from './components/Sidebar'
@@ -26,6 +27,9 @@ export default function App() {
   useEffect(() => {
     // OAuth 리다이렉트 후 세션 복원 및 도메인 검증
     const initAuth = async () => {
+      // 데이터베이스 초기화
+      await setupDatabase()
+
       const { data: { session } } = await supabase.auth.getSession()
       if (session?.user) {
         const email = session.user.email ?? ''
