@@ -14,26 +14,14 @@ export default function Login({ onLogin: _onLogin }: Props) {
     setError('')
     setLoading(true)
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: window.location.href,
-          skipBrowserRedirect: true,
           scopes: 'openid email profile https://www.googleapis.com/auth/calendar.readonly',
           queryParams: { access_type: 'offline', prompt: 'consent' },
         },
       })
-      if (data?.url) {
-        // 팝업으로 열기 (iframe 환경 대응)
-        const popup = window.open(data.url, 'google-login', 'width=500,height=620,left=200,top=100')
-        if (!popup) {
-          // 팝업 차단 시 일반 리다이렉트로 폴백
-          window.location.href = data.url
-        }
-        setLoading(false)
-        return
-      }
-      console.log('OAuth result:', data, error)
       if (error) {
         setError('로그인 오류: ' + error.message)
         setLoading(false)
