@@ -44,3 +44,12 @@ yarn-error.log*
 # Temporary files
 *.tmp
 .temp/
+
+# Security - API Keys and credentials
+client_secret_*.json
+welcon-*.json
+*-d1d16b85c88b.json
+setup-github-secrets-auto.ps1
+
+# Build artifacts
+*.zip
