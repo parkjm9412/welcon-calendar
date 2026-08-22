@@ -10,7 +10,7 @@ interface Props {
 
 const navItems: { id: TabType; label: string; icon: string; adminOnly?: boolean }[] = [
   { id: 'dashboard', label: '오늘 대시보드', icon: '▦' },
-  { id: 'calendar', label: '직원 캘린더', icon: '◫' },
+  { id: 'calendar', label: '캘린더', icon: '◫' },
   { id: 'vehicle', label: '법인 차량 예약', icon: '◉' },
   { id: 'admin', label: '관리자', icon: '⬡', adminOnly: true },
 ]

@@ -1,6 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { setupDatabase } from '@/lib/setupDatabase'
+import {
+  resolveGoogleToken,
+  clearGoogleToken,
+  reconnectGoogleCalendar,
+} from '@/lib/googleAuth'
 import { useIsMobile } from './hooks/useIsMobile'
 import Login from './components/Login'
 import Sidebar from './components/Sidebar'
@@ -18,54 +23,53 @@ interface UserInfo {
   accessToken?: string
 }
 
+function buildUser(session: { user: { email?: string; user_metadata?: Record<string, unknown> }; provider_token?: string | null }): UserInfo {
+  const email = session.user.email ?? ''
+  return {
+    name: (session.user.user_metadata?.full_name as string) ?? email.split('@')[0],
+    email,
+    accessToken: resolveGoogleToken(session.provider_token),
+  }
+}
+
 export default function App() {
   const [user, setUser] = useState<UserInfo | null>(null)
-  const [activeTab, setActiveTab] = useState<TabType>('dashboard')
+  const [activeTab, setActiveTab] = useState<TabType>('calendar')
   const [authChecked, setAuthChecked] = useState(false)
   const isMobile = useIsMobile()
 
   useEffect(() => {
-    // OAuth 리다이렉트 후 세션 복원 및 도메인 검증
     const initAuth = async () => {
-      // 데이터베이스 초기화
       await setupDatabase()
-
       const { data: { session } } = await supabase.auth.getSession()
-      if (session?.user) {
-        const email = session.user.email ?? ''
-        setUser({
-          name: session.user.user_metadata?.full_name ?? email.split('@')[0],
-          email,
-          accessToken: session.provider_token ?? undefined,
-        })
-      }
+      if (session?.user) setUser(buildUser(session))
       setAuthChecked(true)
     }
 
     initAuth()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        const email = session.user.email ?? ''
-        setUser({
-          name: session.user.user_metadata?.full_name ?? email.split('@')[0],
-          email,
-          accessToken: session.provider_token ?? undefined,
-        })
-      } else {
-        setUser(null)
-      }
+      if (session?.user) setUser(buildUser(session))
+      else setUser(null)
     })
 
     return () => subscription.unsubscribe()
   }, [])
 
   const handleLogout = async () => {
+    clearGoogleToken()
     await supabase.auth.signOut()
     setUser(null)
   }
 
-  // 세션 확인 전 빈 화면
+  const handleReconnectCalendar = useCallback(async () => {
+    try {
+      await reconnectGoogleCalendar()
+    } catch (e) {
+      alert(e instanceof Error ? e.message : '연결 실패')
+    }
+  }, [])
+
   if (!authChecked) {
     return (
       <div style={{ minHeight: '100vh', backgroundColor: '#0f1f3d', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -79,10 +83,14 @@ export default function App() {
     return <Login onLogin={(name, email) => setUser({ name, email })} />
   }
 
+  const calendarProps = {
+    accessToken: user.accessToken,
+    onReconnect: handleReconnectCalendar,
+  }
+
   if (isMobile) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#f0f2f7' }}>
-        {/* 모바일 상단 헤더 */}
         <div style={{ backgroundColor: '#0f1f3d', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, position: 'sticky', top: 0, zIndex: 50 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 28, height: 28, borderRadius: 6, backgroundColor: '#253d6b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: 12, color: '#7aa8ff' }}>
@@ -97,16 +105,12 @@ export default function App() {
             로그아웃
           </button>
         </div>
-
-        {/* 콘텐츠 */}
         <main style={{ flex: 1, overflow: 'auto', padding: '20px 16px 90px' }}>
           {activeTab === 'dashboard' && <Dashboard />}
-          {activeTab === 'calendar' && <Calendar accessToken={user.accessToken} userName={user.name} />}
+          {activeTab === 'calendar' && <Calendar {...calendarProps} />}
           {activeTab === 'vehicle' && <VehicleReservation />}
           {activeTab === 'admin' && <Admin />}
         </main>
-
-        {/* 하단 탭바 */}
         <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
     )
@@ -117,7 +121,7 @@ export default function App() {
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} onLogout={handleLogout} user={user} />
       <main style={{ flex: 1, overflow: 'auto', padding: '28px 32px' }}>
         {activeTab === 'dashboard' && <Dashboard />}
-        {activeTab === 'calendar' && <Calendar accessToken={user.accessToken} userName={user.name} />}
+        {activeTab === 'calendar' && <Calendar {...calendarProps} />}
         {activeTab === 'vehicle' && <VehicleReservation />}
         {activeTab === 'admin' && <Admin />}
       </main>
