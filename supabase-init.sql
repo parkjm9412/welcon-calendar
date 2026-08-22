@@ -15,6 +15,11 @@ CREATE TABLE IF NOT EXISTS calendar_sync_logs (
 -- 2️⃣ schedules 테이블에 컬럼 추가
 ALTER TABLE schedules ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'manual';
 ALTER TABLE schedules ADD COLUMN IF NOT EXISTS sync_log_id TEXT;
+ALTER TABLE schedules ADD COLUMN IF NOT EXISTS location TEXT;
+ALTER TABLE schedules ADD COLUMN IF NOT EXISTS memo TEXT;
+ALTER TABLE schedules ADD COLUMN IF NOT EXISTS google_event_id TEXT;
+ALTER TABLE schedules ADD COLUMN IF NOT EXISTS created_by TEXT;
+ALTER TABLE schedules ADD COLUMN IF NOT EXISTS all_day BOOLEAN DEFAULT false;
 
 -- 3️⃣ 성능 인덱스 생성
 CREATE INDEX IF NOT EXISTS idx_schedules_source_owner ON schedules(source, owner);

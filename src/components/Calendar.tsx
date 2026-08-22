@@ -2,6 +2,9 @@ import { useState, useEffect, useCallback } from 'react'
 import { activeEmployees } from '@/data/employees'
 import { fetchGoogleCalendarEvents } from '@/lib/googleCalendar'
 import type { GCalEvent } from '@/lib/googleCalendar'
+import { fetchWebSchedules, createCalendarEvent } from '@/lib/calendarEvents'
+import type { EventFormData } from '@/lib/eventFormat'
+import EventFormModal from './EventFormModal'
 import { useIsMobile } from '@/hooks/useIsMobile'
 
 const YEAR = 2026
@@ -11,7 +14,8 @@ interface CalEvent {
   title: string
   type: string
   time?: string
-  owner: string // 'all' or employee name
+  owner: string
+  date?: string
 }
 
 const allEvents: Record<string, CalEvent[]> = {
@@ -87,13 +91,21 @@ const typeColor: Record<string, string> = {
   important: '#f59e0b',
   meeting:   '#8b5cf6',
   personal:  '#0ca678',
+  trip:      '#06b6d4',
+  vacation:  '#84cc16',
+  deadline:  '#ef4444',
+  other:     '#6366f1',
 }
 
 const typeLabel: Record<string, string> = {
   company:   '전사',
   important: '중요',
-  meeting:   '팀내',
+  meeting:   '미팅',
   personal:  '개인',
+  trip:      '출장',
+  vacation:  '휴가',
+  deadline:  '납기',
+  other:     '기타',
 }
 
 const weekDayLabels = ['일', '월', '화', '수', '목', '금', '토']
@@ -111,15 +123,19 @@ const monthNames = ['1월','2월','3월','4월','5월','6월','7월','8월','9�
 interface Props {
   accessToken?: string
   userName?: string
+  userEmail?: string
 }
 
-export default function Calendar({ accessToken, userName }: Props) {
+export default function Calendar({ accessToken, userName, userEmail }: Props) {
   const [selectedDay, setSelectedDay] = useState<number | null>(16)
   const [viewMonth, setViewMonth] = useState(MONTH)
   const [viewYear, setViewYear] = useState(YEAR)
   const [selectedEmployee, setSelectedEmployee] = useState<string>('all')
   const [gcalEvents, setGcalEvents] = useState<GCalEvent[]>([])
+  const [webEvents, setWebEvents] = useState<CalEvent[]>([])
   const [gcalLoading, setGcalLoading] = useState(false)
+  const [formOpen, setFormOpen] = useState(false)
+  const [formDefaultDate, setFormDefaultDate] = useState<string>()
   const isMobile = useIsMobile()
 
   const loadGCal = useCallback(async (year: number, month: number) => {
@@ -135,9 +151,39 @@ export default function Calendar({ accessToken, userName }: Props) {
     }
   }, [accessToken, userName])
 
+  const loadWebSchedules = useCallback(async (year: number, month: number) => {
+    try {
+      const schedules = await fetchWebSchedules(year, month)
+      setWebEvents(
+        schedules.map((s) => ({
+          title: s.title,
+          type: s.type,
+          time: s.time_start || undefined,
+          owner: s.owner,
+          date: s.date,
+        })),
+      )
+    } catch (e) {
+      console.warn('웹 일정 로드 실패:', e)
+    }
+  }, [])
+
   useEffect(() => {
     loadGCal(viewYear, viewMonth)
-  }, [loadGCal, viewYear, viewMonth])
+    loadWebSchedules(viewYear, viewMonth)
+  }, [loadGCal, loadWebSchedules, viewYear, viewMonth])
+
+  const handleCreateEvent = async (data: EventFormData) => {
+    const result = await createCalendarEvent(data)
+    await loadWebSchedules(viewYear, viewMonth)
+    return { googleSynced: result.googleSynced, googleError: result.googleError }
+  }
+
+  const openFormForDay = (day: number) => {
+    const d = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+    setFormDefaultDate(d)
+    setFormOpen(true)
+  }
 
   const daysInMonth = getDaysInMonth(viewYear, viewMonth)
   const firstDow = getFirstDayOfWeek(viewYear, viewMonth)
@@ -148,9 +194,16 @@ export default function Calendar({ accessToken, userName }: Props) {
   ]
   while (cells.length % 7 !== 0) cells.push(null)
 
-  // Google Calendar 이벤트를 allEvents 구조에 병합
+  // Google Calendar + 웹 등록 일정을 allEvents 구조에 병합
   const mergedEvents: Record<string, CalEvent[]> = { ...allEvents }
   for (const ev of gcalEvents) {
+    if (!mergedEvents[ev.date]) mergedEvents[ev.date] = []
+    if (!mergedEvents[ev.date].find(e => e.title === ev.title && e.owner === ev.owner)) {
+      mergedEvents[ev.date] = [...mergedEvents[ev.date], ev]
+    }
+  }
+  for (const ev of webEvents) {
+    if (!ev.date) continue
     if (!mergedEvents[ev.date]) mergedEvents[ev.date] = []
     if (!mergedEvents[ev.date].find(e => e.title === ev.title && e.owner === ev.owner)) {
       mergedEvents[ev.date] = [...mergedEvents[ev.date], ev]
@@ -208,6 +261,30 @@ export default function Calendar({ accessToken, userName }: Props) {
           <h1 style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: 28, color: '#0f1f3d', margin: 0, letterSpacing: '-0.02em' }}>
             {viewYear}년 {monthNames[viewMonth]}
           </h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            <button
+              onClick={() => {
+                const d = selectedDay
+                  ? `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`
+                  : undefined
+                setFormDefaultDate(d)
+                setFormOpen(true)
+              }}
+              style={{
+                padding: '8px 18px',
+                borderRadius: 8,
+                border: 'none',
+                backgroundColor: '#C8102E',
+                color: '#fff',
+                fontFamily: 'Outfit, sans-serif',
+                fontWeight: 600,
+                fontSize: 13,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              + 일정 등록
+            </button>
           {/* Employee filter */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: isMobile ? 'nowrap' : 'wrap', overflowX: isMobile ? 'auto' : 'visible', paddingBottom: isMobile ? 4 : 0 }}>
             {employees.map((e) => {
@@ -234,6 +311,7 @@ export default function Calendar({ accessToken, userName }: Props) {
                 </button>
               )
             })}
+          </div>
           </div>
         </div>
       </div>
@@ -277,6 +355,7 @@ export default function Calendar({ accessToken, userName }: Props) {
                 <div
                   key={day}
                   onClick={() => setSelectedDay(day === selectedDay ? null : day)}
+                  onDoubleClick={() => openFormForDay(day)}
                   style={{
                     minHeight: 84,
                     padding: '7px',
@@ -385,6 +464,16 @@ export default function Calendar({ accessToken, userName }: Props) {
           </div>
         </div>
       </div>
+
+      <EventFormModal
+        isOpen={formOpen}
+        defaultDate={formDefaultDate}
+        defaultOwner={selectedEmployee !== 'all' ? selectedEmployee : userName}
+        createdBy={userEmail}
+        createdByName={userName}
+        onClose={() => setFormOpen(false)}
+        onSubmit={handleCreateEvent}
+      />
     </div>
   )
 }

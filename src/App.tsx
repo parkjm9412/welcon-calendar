@@ -101,7 +101,7 @@ export default function App() {
         {/* 콘텐츠 */}
         <main style={{ flex: 1, overflow: 'auto', padding: '20px 16px 90px' }}>
           {activeTab === 'dashboard' && <Dashboard />}
-          {activeTab === 'calendar' && <Calendar accessToken={user.accessToken} userName={user.name} />}
+          {activeTab === 'calendar' && <Calendar accessToken={user.accessToken} userName={user.name} userEmail={user.email} />}
           {activeTab === 'vehicle' && <VehicleReservation />}
           {activeTab === 'admin' && <Admin />}
         </main>
